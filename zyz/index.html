@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>志愿者</title>
+		<script src="https://unpkg.com/vue/dist/vue.js"></script> <!-- vue -->
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- vue-axios -->
+		<script src="./js/httpRequest.js" type="text/javascript" charset="utf-8"></script> <!-- 封装请求 -->
+		<script src="./js/jquery-3.6.0.min.js" type="text/javascript" charset="utf-8"></script> <!-- JQ -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> <!-- ui-css -->
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script> <!-- ui-js -->
+		<script src="./js/clickanimate.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="./css/index.css" /> <!-- 默认-css -->
+		<link rel="stylesheet" type="text/css" href="./css/indexcheck2.css" /> <!-- 项目界面样式 -->
+		<link rel="stylesheet" type="text/css" href="./css/main-item.css" /> <!-- 项目item -->
+		<script src="./js/index.js" type="text/javascript" charset="utf-8"></script> <!-- 默认-js -->
+
+
+	</head>
+
+	<body>
+		<div id="app">
+			<el-container v-cloak>
+				<img src="img/logo2.png" style="position: fixed;
+				opacity: 0.1;
+				z-index: 0;
+				width: 800px;
+				padding: 10% 30%;
+				user-select:none;
+				pointer-events: none;
+				cursor: pointer;">
+				<el-header style="background-color: rgb(236, 236, 236);">
+					<div class="serch">
+						<div class="logoad">
+							<img src="./img/logo2.png" class="LOGO">
+							<div class="t1">绵职</div>
+							<div class="t2">志愿</div>
+							<div class="t3">服务网</div>
+							<div class="t4"></div>
+						</div>
+
+
+						<el-input placeholder="请输入内容" prefix-icon="el-icon-search" v-model="input2"
+							@keyup.enter.native="search(input2)">
+						</el-input>
+						<a :href="loginhref" class="login" @click="checkindex" v-loading.fullscreen.lock="loading"><i
+								class="el-icon-user"></i><span> {{logintext}}
+							</span><span
+								style="font-size: 1.2rem;font-weight:500;line-height: 2rem;position: relative;top: 1px;"
+								v-if="logintext != '您好!'">/</span><span>{{signtext}}</span></a><span @click="signout()"
+							class="signout" v-if="logintext != '登录'">{{logout}}</span>
+					</div>
+
+				</el-header>
+				<div v-if="indexcheck == true">
+					<el-main style="height: 930px;">
+						<el-menu class="el-menu-demo" mode="horizontal" active-text-color="red" :unique-opened="true"
+							:default-active="activeIndex">
+							<el-menu-item index="1" default-active @click="back()">首页</el-menu-item>
+							<el-menu-item index="2" @click="goto('xw')">志愿新闻</el-menu-item>
+							<el-menu-item index="3" @click="goto('fc')">志愿风采</el-menu-item>
+							<el-menu-item index="4" @click="goto('zx')">志愿之星</el-menu-item>
+							<el-menu-item index="5" @click="goto('gy')">关于</el-menu-item>
+
+						</el-menu>
+
+
+						<template>
+							<el-carousel :interval="3000" type="card" height="480px" style="margin-top: 180px;">
+								<el-carousel-item v-for="(img,index) in carousel_img" :key="img.index" :name="img.text">
+									<img :src="img.src" style="height: 100%;">
+
+									<p>{{img.option}}</p>
+								</el-carousel-item>
+							</el-carousel>
+						</template>
+
+
+					</el-main>
+					<el-header>
+						<p class="zyfc">志愿新闻</p>
+
+					</el-header>
+					<el-main style="height: 950px;width: 100%;">
+						<el-row :gutter="0">
+							<el-col :span="8" :offset="2">
+								<div class="top-news">
+									<p class="news-option">动态新闻＞＞</p>
+									<img src="./img/new1.jpg" class="news-img">
+									<p class="top-news-th">开展党员志愿服务活动 助力全国文明典范城市创建</p>
+									<p class="top-news-td">
+										绵阳市委外办认真贯彻落实市委决策部署，按照市文明办和市直机关工委相关工作部署，结合单位实际，及时印发活动方案和通知，按照小规模、多点位，就近就便，安全有序的原则，通过内外联动、走村入户等多种形式，组织全办干部职工和党员志愿者开展各类志愿服务活动，全力助力全国文明典范城市创建。
+									</p>
+									<p class="news-href" style="font-size: 1.5rem;"><a href="javascript:;">更多...</a></p>
+								</div>
+							</el-col>
+							<el-col :span="6">
+								<div class="main-news">
+									<p class="news-option">校园时讯</p>
+									<p v-for="item in newsdata" class="main-news-x">
+										<a href="javascript:;" class="main-news-x">{{item}}</a>
+									</p>
+									<p class="news.href" style="margin-left: 80%;line-height: 2rem;font-weight: 600;"><a
+											href="javascript:;">更多...</a></p>
+									<p class="news-option">最新新闻</p>
+									<p v-for="item in newsdataitem" class="main-news-x">
+										<a href="javascript:;" class="main-news-x">{{item}}</a>
+									</p>
+									<p class="news-href" style="margin-left: 80%;line-height: 2rem;"><a
+											href="javascript:;">更多...</a></p>
+								</div>
+							</el-col>
+							<el-col :span="7">
+								<div class="cn-news">
+									<p class="news-option " style="width: 100%;padding: 0;">其他新闻 </p>
+
+									<img src="./img/onews1.jpg" alt="" class="news-img onews">
+									<p class="top-news-td onews-option">星夜驰援 四川乐山志愿者4天转移河南卫辉200余人</p>
+
+									<img src="./img/onews2.jpeg" alt="" class="news-img onews">
+									<p class="top-news-td onews-option"> 重庆酉阳：千名青年学子投身社会实践 助力乡村振兴</p>
+
+									<img src="./img/onews3.jpeg" alt="" class="news-img onews">
+									<p class="top-news-td onews-option">湖北黄冈:志愿服务队支援河南巩义灾后消杀</p>
+									<span class="news-href" style="line-height: 5rem;"><a
+											href="javascript:;">更多...</a></span>
+								</div>
+							</el-col>
+						</el-row>
+					</el-main>
+					<el-header>
+						<p class="zyfc">志愿风采</p>
+					</el-header>
+					<el-main>
+						<template>
+							<el-carousel class="fc" indicator-position="none" arrow="always">
+								<el-carousel-item v-for="(img,index) in carousel_fengcai" :key="img.index"
+									style="height: 600px;" indicator-position="none">
+									<img :src="img.src" class="fc_img">
+									<p class="fc_option">{{img.option}}</p>
+									<p class="fc_body">{{img.body}}</p>
+								</el-carousel-item>
+							</el-carousel>
+						</template>
+					</el-main>
+					<el-footer>
+						<p class="zyfc" style="color: red;">志愿之星</p>
+					</el-footer>
+					<el-main>
+
+						<template>
+							<el-table :data="tableData" style="width: 80%;margin:0 auto;background-color: red;" stripe
+								sortable border>
+
+								<el-table-column prop="name" label="姓名" width="370" align="center">
+								</el-table-column>
+								<el-table-column prop="self" label="参加志愿次数" width="290" align="center" sortable>
+								</el-table-column>
+								<el-table-column prop="team" label="参加团体志愿者次数" width="290" align="center" sortable>
+								</el-table-column>
+								<el-table-column prop="math" label="总分" width="290" sortable align="center">
+									<template v-slot:default="scope">
+										<el-rate v-model="scope.row.math" disabled show-score text-color="#ff9900">
+										</el-rate>
+									</template>
+								</el-table-column>
+								<el-table-column prop="rank" label="排名" width="281" sortable align="center">
+								</el-table-column>
+							</el-table>
+						</template>
+						<div class="zx-bottom">
+							<a href="javasciript:;"><img src="./img/newsbottom1.png" alt=""></a>
+							<a href="login/index.html"><img src="./img/newsbottom.png" alt=""></a>
+							<a href="javasciript:;"><img src="./img/newsbottom2.png" alt=""></a>
+							<a href="javasciript:;"><img src="./img/newsbottom3.png" alt=""></a>
+
+
+						</div>
+					</el-main>
+					<el-footer class="syfooter" style="height: 320px;overflow: hidden;">
+						<div class="bt-href">
+							<h3 style="color: white;margin: 20px 0;">相关链接</h3>
+							<p><a href="https://www.mypt.edu.cn/">绵阳职业技术学院</a></p>
+							<p><a href="https://ccee.mypt.edu.cn/">计算机科学系</a></p>
+							<p><a href="http://www.zgzyz.org.cn/">中国青年志愿者网</a></p>
+						</div>
+						<div class="bt-href" style="margin-top: -270px;margin-left: 250px;">
+							<h3 style="color: white;margin: 20px 0;">主办单位</h3>
+							<p><a href="#">共青团中央青年志愿者工作部</a></p>
+							<p><a href="#">绵阳职业技术学院志愿者部</a></p>
+						</div>
+						<div class="bt-href" style="margin-top: -270px;margin-left: 500px;">
+							<h3 style="color: white;margin: 20px 0;">联系我们</h3>
+							<p><a href="#"> <i class="el-icon-phone"></i>12345678900</a></p>
+							<p><a href="#"> <i class="el-icon-s-comment"></i>1234567890@gmail.com</a></p>
+
+						</div>
+						<p class="bttext">绵职志愿服务网</p>
+						<div class="bt-information">
+							<p>版权所有©1999-2020 绵阳职业技术学院 蜀ICP备15003825-2号 川公网安备 51070402110168号</p>
+							<p>学院地址：四川省绵阳市游仙区仙人路一段三十二号 联系电话：0816-2202006 传真：0816-2202114 邮编：621000</p>
+						</div>
+
+					</el-footer>
+				</div>
+
+
+				<div v-else-if="indexcheck == false" class="indexcheck2">
+					<div class="user-top">
+
+						<template>
+							<el-select v-model="usertop.value[0]" placeholder="服务类型" clearable>
+								<el-option v-for="item in usertop.type" :key="item.value" :label="item.label"
+									:value="item.value">
+								</el-option>
+							</el-select>
+						</template>
+						<template>
+							<el-select v-model="usertop.value[1]" placeholder="服务对象" clearable>
+								<el-option v-for="item in usertop.obj" :key="item.value" :label="item.label"
+									:value="item.value">
+								</el-option>
+							</el-select>
+						</template>
+						<template>
+							<el-select v-model="usertop.value[2]" placeholder="项目人数" clearable>
+								<el-option v-for="item in usertop.num" :key="item.value" :label="item.label"
+									:value="item.value">
+								</el-option>
+							</el-select>
+						</template>
+						<template>
+							<el-select v-model="usertop.value[3]" placeholder="状态" clearable>
+								<el-option v-for="item in usertop.state" :key="item.value" :label="item.label"
+									:value="item.value">
+								</el-option>
+							</el-select>
+						</template>
+
+					</div>
+					<div class="add-obj" @click="creatobjdialog = true">
+						<span>
+							发布志愿项目
+						</span>
+					</div>
+					<div class="user-main">
+						<ul>
+							<li v-for="(item,index) in OBJ" @click="objdetail(item.id)">
+								<div class="main-item">
+									<div class="user-item-option">
+										{{item.name}}
+									</div>
+									<div class="user-item-info">
+										<div>
+											<span style="background-color:#467F8E">岗位</span>
+											<span style="background-color:#56B8D0">目标</span>
+											<span style="background-color:#3EC08D">报名</span>
+										</div>
+										<div>
+											<span style="background-color:#467F8E">{{item.post}}个</span>
+											<span style="background-color:#56B8D0">{{item.target}}个</span>
+											<span style="background-color:#3EC08D">{{item.sign}}个</span>
+										</div>
+									</div>
+									<div class="user-item-state"
+										:style="{'background-color': (item.speed == 0 ? 'red':'rgba(71, 214, 105, 1.0)'),'animation':(item.speed == 0 ? 'animated-borderred 1.5s infinite':'animated-border 1.5s infinite;')}">
+										<span v-if="item.speed != 0">招募中</span><span
+											v-else-if="item.speed == 0">已结束</span>
+									</div>
+									<div class="user-item-time">
+										<span>{{item.starttime}}</span>-<span>{{item.endtime}}</span>
+									</div>
+									<div class="user-item-progressbar">
+										<el-progress :text-inside="true" :stroke-width="44" :percentage="item.speed"
+											status="success"></el-progress>
+									</div>
+
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="user-info">
+						<div class="user-defaultinfo">
+							<p>用户名：{{userinfo.text}}</p>
+							<p>名字：{{userinfo.name}}</p>
+						</div>
+						<div class="user-info-item">
+							<div @click="datadialog = true">我的资料</div>
+							<div>发布的项目</div>
+							<div>参加的项目</div>
+							<div @click="modifypassword">修改密码</div>
+						</div>
+
+					</div>
+				</div>
+
+				<!-- 发布项目对话框 -->
+				<el-dialog title="发布项目" :visible.sync="creatobjdialog">
+					<el-form ref="createobjform" :model="createobjform" label-width="100px">
+						<el-form-item label="项目标题">
+							<el-input v-model="createobjform.name"></el-input>
+						</el-form-item>
+						<el-form-item label="项目类型">
+							<el-select v-model="createobjform.type" placeholder="请选择类型">
+								<el-option label="互帮互助" value="hubang"></el-option>
+								<el-option label="大型活动" value="huodong"></el-option>
+								<el-option label="环境保护" value="huanjing"></el-option>
+								<el-option label="文明风尚" value="wenming"></el-option>
+								<el-option label="其他" value="qita"></el-option>
+							</el-select>
+						</el-form-item>
+						<el-form-item label="岗位数量">
+							<el-input v-model="createobjform.post"></el-input>
+						</el-form-item>
+						<el-form-item label="人数要求">
+							<el-input v-model="createobjform.target"></el-input>
+						</el-form-item>
+
+						<el-form-item label="项目时间">
+							<el-col :span="6">
+								<el-date-picker type="date" placeholder="选择日期" v-model="createobjform.date1"
+									style="width: 100%;"></el-date-picker>
+							</el-col>
+							<el-col class="line" :span="2" style="text-align: center;">-</el-col>
+							<el-col :span="6">
+								<el-date-picker type="date" placeholder="选择日期" v-model="createobjform.date2"
+									style="width: 100%;"></el-date-picker>
+							</el-col>
+						</el-form-item>
+						<el-form-item label="详情">
+							<el-input type="textarea" v-model="createobjform.desc"></el-input>
+						</el-form-item>
+					</el-form>
+					<div slot="footer" class="dialog-footer">
+						<el-button @click="closecreatedialog">取 消</el-button>
+						<el-button type="primary" @click="getcreateobj">确 定</el-button>
+					</div>
+				</el-dialog>
+				<!-- 修改密码对话框 -->
+				<el-dialog title="修改密码" :visible.sync="modifypassworddialog" width="30%">
+					<el-form ref="form" :model="modifypass" label-width="80px">
+						<el-form-item label="旧密码">
+							<el-input v-model="modifypass.oldpassword"></el-input>
+						</el-form-item>
+						<el-form-item label="新密码">
+							<el-input v-model="modifypass.newpassword"></el-input>
+						</el-form-item>
+					</el-form>
+					<span slot="footer" class="dialog-footer">
+						<el-button @click="modifypassworddialog = false">取 消</el-button>
+						<el-button type="primary" @click="getmodifypassword">确 定</el-button>
+					</span>
+				</el-dialog>
+				<!-- 个人资料对话框 -->
+				<el-dialog title="个人信息" :visible.sync="datadialog" width="30%" class="datadialog">
+					<p>ID:{{userinfo.id}}</p>
+					<p>姓名:{{userinfo.name}}</p>
+					<p>用户名:{{userinfo.text}}</p>
+					<p>密码:{{userinfo.password}}</p>
+					<el-form ref="form" :model="userinfo" label-width="100px">
+						<el-form-item label="手机:" style="width: 300px;margin-left: -55px;">
+							<el-input v-model="userinfo.phone"></el-input>
+						</el-form-item>
+						<el-form-item label="年龄:" style="width: 150px;margin-top: -10px;margin-left: -55px;">
+							<el-input v-model="userinfo.age"></el-input>
+						</el-form-item>
+					</el-form>
+					<span slot="footer" class="dialog-footer">
+						<el-button type="primary" @click="modifyuserdata">确 定</el-button>
+					</span>
+				</el-dialog>
+
+
+
+
+
+				<!-- 项目详情 -->
+				<el-dialog title="详情" :visible.sync="objdetaildialog" width="50%" center>
+					<el-form ref="form" :model="objdetaildata" label-width="100px" class="objdetaildialog">
+						<p>项目标题:{{objdetaildata.name}}</p>
+						<p>发起人:{{objdetaildata.user}}</p>
+						<p>岗位数量:{{objdetaildata.post}}</p>
+						<p>需要人数:{{objdetaildata.target}}</p>
+						<p>时间:{{objdetaildata.starttime}}~{{objdetaildata.endtime}}</p>
+						<p>已报名:{{objdetaildata.sign}}</p>
+						<p>项目详情:{{objdetaildata.detail}}</p>
+						<button type="button" @click="signup(objdetaildata.id,objdetaildata.userid)">我要报名</button>
+					</el-form>
+					<span slot="footer" class="dialog-footer">
+
+						<el-button type="primary" @click="objdetaildialog = false">关闭</el-button>
+					</span>
+				</el-dialog>
+
+
+			</el-container>
+			</el-alert>
+			<div class="goback">
+				<img src="./img/箭头.png" @click="back">
+			</div>
+
+			<!-- 飘窗 -->
+			<!-- <div id="float"><img id="floatImg" src="img/fdlogo.png">
+			<div class="drop">×</div>
+		</div> -->
+
+		</div>
+	</body>
+	<script>
+		new Vue({
+			el: '#app',
+			data() {
+				return {
+					input2: '', //搜索框
+					scroll: '', //监听滚动
+					activeIndex: '1', //导航栏默认高亮
+					carousel_fc: '1',
+					carousel_top: '2',
+					logout: '退出', //退出登录
+					loginhref: 'login/index.html', //登录按钮超链接
+					logintext: '登录',
+					signtext: '注册',
+					indexcheck: true, //界面切换
+					userinfo: {}, //用户信息
+					creatobjdialog: false, // 控制创建项目对话框
+					loading: false, //是否加载中
+					modifypassworddialog: false, //控制密码对话框
+					datadialog: false, //个人资料对话框
+					objdetaildialog: false, //项目详情对话框 
+					carousel_img: [{
+							src: "./img/1.jpg",
+							option: " 志愿者在给同学们做核酸"
+						}, {
+							src: "./img/2.jpg",
+							option: "  帮助同学拿行李"
+						},
+						{
+							src: "./img/3.jpg",
+							option: "  帮助同学拿行李（2）"
+						},
+						{
+							src: "./img/4.jpg",
+							option: " 社团"
+						},
+						{
+							src: "./img/5.jpg",
+							option: " 进校检查 "
+						},
+					],
+					carousel_fengcai: [{
+							src: "./img/fc1.jpg",
+							option: " 用奋斗点亮最美年华 用奉献谱写志愿篇章——材料工程系学生张昆玉先进事迹",
+							body: " 张昆玉同学曾获“绵阳十佳志愿者”的称号，自2017年9月加入院材料工程系青年志愿服务队（以下简称服务队）以来，时刻保持前进的动力，始终怀揣一颗赤诚的心。她带领服务队无私奉献，踏实肯干，出色地完成各项任务，不断弘扬着志愿者精神，累计服务时间长达720小时。作为一名新青年，她时刻秉承着中华民族尊老爱幼的优良传统，真诚地关心着身边的老人和孩子。"
+						},
+						{
+							src: "./img/fc2.jpg",
+							body: "绵阳职院建材181班的邓含在疫情发生后迅速动员身边的亲朋好友进行募捐，联系正在日本留学的同学购买了大量的医用口罩和防护服寄往疫区。他们分别向武汉大学人民医院、四川省人民医院、绵阳四〇四医院和绵阳市人民医院捐赠了价值1.6万余元的医务用品。据悉，他们日前又采购了4千余元的物资正陆续寄出。",
+							option: "让青春在战“疫”中闪光 绵职学子抗击疫情速写"
+						},
+						{
+							src: "./img/fc3.jpg",
+							body: "2015年4月，绵阳职业技术学院的张庆、伍黎、罗思露等7位同学自发组建一个支教团体——“青义支教”，意指青年义务。当被问及为何取了这么个名字时，张庆很认真地说：中国需要强健的青年一代，而为国家社会做出努力是青年应尽的义务。这义务可以是好好学习，可以是积极创业，也可以是支援山区建设，而我们选择的便是去支教。",
+							option: "青义支教：绵职院学生与贵州山区小学的不解情缘"
+						},
+						{
+							src: "./img/fc4.jpg",
+							body: "在2008年5.12大地震发生的第一时间，陈波同志立即与绵阳市涪城区武装部取得联系，在不耽误自己本职工作的情况下，跟随部队前往北川县擂鼓镇开展抢险救灾工作。在72小时的黄金救援时间中，陈波顾不得白天黑夜的到来，也顾不得身心的劳累，和部队官兵、志愿者们一起搜救生还者、抬担架、运送生活物资，为伤者进行简单地包扎，安慰失去亲人的灾民，只要是力所能及之处，他都全力以赴。",
+							option: "抗震救灾彰显大爱 挺身而出展风采"
+						},
+					],
+					tableData: [{
+							name: '李四',
+							self: '2',
+							team: '4',
+							math: 3,
+							rank: '2'
+						},
+						{
+							name: '谢九',
+							self: '5',
+							team: '3',
+							math: 4,
+							rank: '1'
+						},
+						{
+							name: '杨七',
+							self: '1',
+							team: '2',
+							math: 1.5,
+							rank: '5'
+						},
+						{
+							name: '赵六',
+							self: '3',
+							team: '3',
+							math: 3,
+							rank: '2'
+						},
+						{
+							name: '王五',
+							self: '4',
+							team: '1',
+							math: 2.5,
+							rank: '3'
+						},
+						{
+							name: '陈八',
+							self: '5',
+							team: '0',
+							math: 2.5,
+							rank: '3'
+						},
+						{
+							name: '张三',
+							self: '1',
+							team: '3',
+							math: 2,
+							rank: '4'
+						},
+					],
+					newsdata: ["财经商贸学院学习贯彻绵阳市第八次党代会精神",
+						"机关一党总支第三支部开展2021年10月政治理论专题学习会",
+						"公共教育学院专题学习《关于推动现代职业教育高质量发展的意见》",
+						"电子与信息学院举行2021级新生座谈会",
+						"公共教育学院专题宣讲绵阳市第八次党代会会议精神",
+						"旅游与管理学院召开党总支成立暨选举大会",
+						"学校举行2021年度绵阳市退役军人就业（创业）技能提升培训开班仪式",
+						"党委常委、副校长代红英走进课堂为学生讲党史",
+						"智能制造学院召开2022届毕业生就业专题工作会",
+						"财经商贸学院举行新商科智慧实训中心项目培训"
+					],
+					newsdataitem: [
+						"校长何礼果出席绵阳市“两会” 我校人大代表政协委员积极履职",
+						"机关第一党总支及所属各支部召开换届选举大会",
+						"党委书记钟乐海赴材料与建造学院宣讲绵阳市第八次党代会精神​",
+						"学校喜获教育部行指委职业教育改革创新课题立项",
+						"学校召开2021年党委理论学习中心组第11次集中学习会"
+					],
+					usertop: {
+						type: [{
+							value: '选项1',
+							label: '互帮互助'
+						}, {
+							value: '选项2',
+							label: '大型活动'
+						}, {
+							value: '选项3',
+							label: '环境保护'
+						}, {
+							value: '选项4',
+							label: '文明风尚'
+						}, {
+							value: '选项5',
+							label: '其他'
+						}],
+						obj: [{
+							value: '选项1',
+							label: '学生'
+						}, {
+							value: '选项2',
+							label: '老师'
+						}, {
+							value: '选项3',
+							label: '其他'
+						}],
+						num: [{
+							value: '选项1',
+							label: '1-3'
+						}, {
+							value: '选项2',
+							label: '4-10'
+						}, {
+							value: '选项3',
+							label: '10+'
+						}],
+						state: [{
+							value: '选项1',
+							label: '待启动'
+						}, {
+							value: '选项2',
+							label: '招募中'
+						}, {
+							value: '选项3',
+							label: '招募已结束'
+						}, {
+							value: '选项4',
+							label: '已结项'
+						}, ],
+						value: ['', '', '', '']
+					},
+					createobjform: {
+						name: '',
+						type: '',
+						post: '',
+						target: '',
+						date1: '',
+						date2: '',
+						desc: ''
+
+					},
+					OBJ: {}, //所有项目数据
+					objdetaildata: {}, //正在打开的项目详情数据
+					modifypass: {
+						oldpassword: '',
+						newpassword: ''
+					} //正在修改的密码
+				}
+			},
+			created() {
+				this.getname(),
+					this.getobj()
+			},
+			methods: {
+				
+				async getname() {
+					let id = window.location.search.replace("?id=", "")
+					if (id == "") {
+						return console.log("未登录");
+					}
+					await axios({
+							method: "get",
+							url: "http://47.96.151.77:3001/id",
+							params: {
+								id: id,
+							},
+						})
+						.then((res) => {
+							// console.log(res);
+							this.userinfo = res.data[0]
+							this.signtext = res.data[0].name
+							this.logintext = "您好!"
+							this.loginhref = '#'
+						})
+						.catch((res) => {
+							console.log(res);
+						});
+				},
+				goto(i) {
+					if (i === "xw") {
+						$('body,html').animate({
+							scrollTop: "970"
+						}, 500);
+					}
+					if (i === "fc") {
+						$('body,html').animate({
+							scrollTop: "2020"
+						}, 500);
+					}
+					if (i === "zx") {
+						$('body,html').animate({
+							scrollTop: "3000"
+						}, 500);
+					}
+					if (i === "gy") {
+						$('body,html').animate({
+							scrollTop: "3450"
+						}, 500);
+					}
+
+				},
+
+				back() {
+					$('body,html').animate({
+						scrollTop: "0"
+					}, 500);
+				},
+				menu() {
+					this.scroll = document.documentElement.scrollTop || document.body.scrollTop;
+					if (this.scroll > 3201) {
+						this.activeIndex = '5';
+					} else
+					if (this.scroll >= 2920 && this.scroll < 3390) {
+						this.activeIndex = '4';
+					} else
+					if (this.scroll >= 1950 && this.scroll < 2920) {
+						this.activeIndex = '3';
+					} else
+					if (this.scroll >= 900 && this.scroll < 1950) {
+						this.activeIndex = '2';
+					}
+					if (this.scroll < 899) {
+						this.activeIndex = '1';
+						$(".goback").fadeOut()
+					} else {
+						$(".goback").fadeIn()
+					}
+
+				},
+				search(wd) {
+					window.location.href = ("http://www.baidu.com/s?wd=" + wd);
+
+				},
+				signout() {
+					window.location.search = "";
+					this.loginhref = "login/index.html"
+					this.indexcheck = 1
+				},
+				checkindex() {
+					this.loading = true
+					setTimeout(() => {
+						if (this.loginhref == '#') {
+							this.indexcheck = !this.indexcheck
+							this.loading = false
+						}
+					}, 1100)
+
+				},
+				async getobj() {
+					await axios({
+							method: "get",
+							url: "http://47.96.151.77:3001/getobj",
+						})
+						.then((res) => {
+							// console.log(res);
+							newdata = []
+							for (let i = res.data.length - 1; i >= 0; i--) {
+								newdata.push(res.data[i])
+							}
+							// console.log(newdata);
+							this.OBJ = newdata
+						})
+						.catch((res) => {
+							console.log(res);
+						});
+				},
+				// 提交创建项目
+				async getcreateobj() {
+					// console.log(this.createobjform);
+
+					let start = JSON.stringify(this.createobjform.date1)
+					let end = JSON.stringify(this.createobjform.date2)
+					let starttime = start.substring(1, 11)
+					let endtime = end.substring(1, 11)
+					this.creatobjdialog = false
+
+					await axios({
+							method: "get",
+							url: "http://47.96.151.77:3001/addobj",
+							params: {
+								name: this.createobjform.name,
+								user: this.userinfo.name,
+								userid: this.userinfo.id,
+								type: this.createobjform.type,
+								post: this.createobjform.post,
+								target: this.createobjform.target,
+								sign: '2',
+								starttime: starttime,
+								endtime: endtime,
+								detail: this.createobjform.desc
+							},
+						})
+						.then((res) => {
+							console.log(res);
+							console.log("成功！");
+							alert("发布成功！")
+							this.getobj()
+
+						})
+						.catch((res) => {
+							console.log(res);
+							alert("发布失败！")
+						});
+
+				},
+				// 关闭创建项目对话框
+				closecreatedialog() {
+					this.creatobjdialog = false
+					this.createobjform = {}
+				},
+				// 修改密码
+				modifypassword() {
+					this.modifypassworddialog = true
+				},
+				// 提交修改密码
+				async getmodifypassword() {
+
+					this.modifypassworddialog = false
+					// console.log(this.modifypass.oldpassword);
+					await axios({
+							method: "get",
+							url: "http://47.96.151.77:3001/modifypassword",
+							params: {
+								id: this.userinfo.id,
+								oldpassword: this.modifypass.oldpassword,
+								newpassword: this.modifypass.newpassword
+							}
+						})
+						.then((res) => {
+							if (res.data.changedRows == 1) {
+								alert("修改成功啦！！")
+
+							} else {
+								console.log("修改失败!");
+							}
+							this.modifypass = {
+								oldpassword: '',
+								newpassword: ''
+							}
+						})
+						.catch((res) => {
+							console.log(res);
+						});
+				},
+				// 修改用户资料
+				async modifyuserdata() {
+					this.datadialog = false
+
+					await axios({
+							method: "get",
+							url: "http://47.96.151.77:3001/modifyuserdata",
+							params: {
+								id: this.userinfo.id,
+								phone: this.userinfo.phone,
+								age: this.userinfo.age
+							}
+						})
+						.then((res) => {
+							if (res.data.changedRows == 1) {
+								alert("修改成功啦！！")
+							} else {
+								console.log("修改失败！")
+							}
+						})
+						.catch((res) => {
+							console.log(res);
+						});
+
+				},
+				// 项目详情
+				async objdetail(objid) {
+					// console.log(objid);
+					await axios({
+							method: "get",
+							url: "http://47.96.151.77:3001/objdetaildata",
+							params: {
+								id: objid,
+							}
+						})
+						.then((res) => {
+							this.objdetaildata = res.data[0]
+							if (res.data[0].speed == 0) {
+								return alert("该项目人数已满！！")
+							}
+							// console.log(this.objdetaildata);
+							this.objdetaildialog = true
+						})
+						.catch((err) => {
+							console.log(err);
+						});
+
+				},
+				// 项目报名
+				signup(objid, userid) {
+					if (userid == this.userinfo.id) {
+						alert("不能报名自己的项目")
+						return
+					}
+
+					axios({
+							method: "get",
+							url: "http://47.96.151.77:3001/addsignuser",
+							params: {
+								objid: objid,
+								userid: this.userinfo.id
+							}
+						})
+						.then((res) => {
+							// console.log(res);
+							if (res.status == 202) {
+								return alert("你已经报名了~")
+							}
+							// console.log(res);
+							alert("报名成功！记得准时参加哦~")
+							this.getobj()
+							this.objdetaildialog = false
+						})
+						.catch((err) => {
+							console.log(err);
+							alert("报名失败！")
+						});
+
+
+				}
+			},
+			mounted() {
+				window.addEventListener('scroll', this.menu)
+			},
+		})
+	</script>
+
+</html>

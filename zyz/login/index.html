@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>登录</title>
+		<link rel="stylesheet" href="./style.css">
+		<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="https://unpkg.com/vue/dist/vue.js"></script> <!-- vue -->
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- vue-axios -->
+		<script src="../js/httpRequest.js" type="text/javascript" charset="utf-8"></script> <!-- 封装请求 -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"> <!-- ui-css -->
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script> <!-- ui-js -->
+	</head>
+	<body>
+		<div class="bg">
+			<img src="../img/bg.png">
+		</div>
+
+
+
+
+		<div class="container">
+			<div class="login-box">
+				<!-- <div class="apple-btn login-apple"> -->
+				<!-- <li class="red-btn" onclick="back()">返回</li> -->
+				<!-- <li class="yellow-btn"></li>
+					<li class="green-btn"></li> -->
+				<!-- </div> -->
+
+				<div class="back" onclick="back()">
+					<img src="../img/back.png" style="width: 100%;">
+				</div>
+
+				<div class="title">账号登录</div>
+				<div class="input">
+					<input type="text" id="login-user" placeholder="用户名">
+				</div>
+				<div class="input">
+					<input type="password" id="login-password" placeholder="密码">
+				</div>
+				<div class="btn login-btn" onclick="login()">
+					<span>登录</span>
+				</div>
+				<div class="change-box login-change">
+					<div class="change-btn toSign">
+						<span>去注册</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="sign-box">
+				<!-- <div class="apple-btn sign-apple">
+					<li class="red-btn"></li>
+					<li class="yellow-btn"></li>
+					<li class="green-btn"></li>
+				</div> -->
+				<div class="title">账号注册</div>
+				<div class="input">
+					<input type="text" id="sign-name" placeholder="姓名" style="width: 30%;">
+				</div>
+				<div class="input">
+					<input type="text" id="sign-user" placeholder="用户名不能为空">
+				</div>
+				<div class="input">
+					<input type="password" id="sign-password" placeholder="密码不能少于8位">
+				</div>
+				<div class="input">
+					<input type="password" id="sign-phone" placeholder="手机号码必须是11位">
+				</div>
+				<div class="btn sign-btn" onclick="sign()">
+					<span>注册</span>
+				</div>
+				<div class="change-box sign-change">
+					<div class="change-btn toLogin">
+						<span>去登陆</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<script src="./script.js"></script>
+		<script type="text/javascript">
+			function cookie() {
+				let cookie = document.cookie
+				let u = cookie.split(";")
+				let list = []
+				for (var i = 0; i < u.length; i++) {
+					list.push(u[i].split("="))
+				}
+				if (list[0][0] == "user") {
+					getSelector("#login-user").value = list[0][1]
+					getSelector("#login-password").value = list[1][1]
+				} else {
+					getSelector("#login-user").value = list[1][1]
+					getSelector("#login-password").value = list[0][1]
+				}
+
+
+			}
+			cookie()
+
+			async function login() {
+				let password = getSelector("#login-password").value,
+					user = getSelector("#login-user").value
+				if (user == "" || password == "") {
+					return alert("账号或密码不能为空!")
+				}
+
+				await axios({
+						method: "get",
+						url: "http://47.96.151.77:3001/login",
+						params: {
+							user: user,
+							password: password
+						},
+					})
+					.then((res) => {
+						// console.log(res);
+						if (res.data[0] == undefined) {
+							alert("账号或者密码错误");
+						} else {
+							// console.log(res.data[0].name);
+							id = res.data[0].id
+							document.cookie = "user=" + user
+							document.cookie = "password=" + password
+							alert("登陆成功！")
+							setTimeout(() => {
+								window.location.href = "/zyz/index.html?id=" + id
+							}, 1000)
+						}
+
+					})
+					.catch((res) => {
+						console.log(res);
+						alert("登陆失败！")
+					});
+
+			}
+
+			async function sign() {
+				let name = getSelector("#sign-name").value
+				password = getSelector("#sign-password").value
+				user = getSelector("#sign-user").value
+				phone = getSelector("#sign-phone").value
+				if (name.length == "" || user.length == "" || password.length < 8 || phone.length != 11) {
+					return alert("格式不正确，请重新输入！")
+				}
+
+
+				await axios({
+						method: "get",
+						url: "http://47.96.151.77:3001/register",
+						params: {
+							name: name,
+							user: user,
+							password: password,
+							phone: phone
+						},
+					})
+					.then((res) => {
+						if (res.status == 200) {
+							alert("注册成功！")
+							document.cookie = "user=" + user
+							document.cookie = "password=" + password
+							getSelector("#login-user").value = user
+							getSelector("#login-password").value = password
+							loginBox.classList.remove("animate_login");
+							signBox.classList.remove("animate_sign");
+						} else {
+							alert("注册失败")
+						}
+
+
+					})
+					.catch((res) => {
+						alert("账号已被注册")
+					});
+			}
+
+			function back() {
+				window.location.href = "../index.html"
+			}
+		</script>
+	</body>
+</html>
